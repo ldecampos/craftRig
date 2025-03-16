@@ -2,6 +2,14 @@
 import re
 from typing import Union
 
+# CONSTANTS
+SEPARATOR = '_'
+NAME_TEMPLATE = "{name}{position}{separator}{side}"  # namePosition_side
+VALID_SIDE = ['l', 'r', 'c', 'm', 'left', 'right', 'center', 'middle']
+VALID_POSITION = ['forward', 'backward', 'front', 'back',
+                  'up', 'down', 'top', 'bottom',
+                  'in', 'out', 'inside', 'outside']
+
 
 # VALIDATORS
 def is_string(text: str) -> bool:
@@ -168,6 +176,30 @@ def is_character_in(text: str, character: str = '_') -> bool:
     """
 
     return bool(character in text)
+
+
+def is_valid(element: str, valid_list: list) -> bool:
+    """Check if an element is present in a list of valid items
+
+    Args:
+        element (str): Element to check for presence in the valid list
+        valid_list (list): The list of valid items to check against
+
+    Returns:
+        bool: True if the element is in the valid list, False otherwise.
+
+    Examples:
+        >>> is_valid("apple", ["apple", "banana", "cherry"])
+        True
+        >>> is_valid("orange", ["apple", "banana", "cherry"])
+        False
+        >>> is_valid("car", ["bike", "bus", "train"])
+        False
+        >>> is_valid("bus", ["bike", "bus", "train"])
+        True
+    """
+
+    return element in valid_list
 
 
 # GETTERS
@@ -685,6 +717,35 @@ def split_text(text: str) -> list:
     return re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=\s|$)|[0-9]+|[a-z]+|[A-Za-z]+(?=[_-])', text)
 
 
+def capitalize_first(text: str) -> str:
+    """Capitalize the first letter of a text
+
+    Args:
+        text (str): Text to capitalize
+
+    Returns:
+        str: Text with the first letter capitalized
+
+    Example:
+        >>> capitalize_first('nameOfVariable')
+        'NameOfVariable'
+        >>> capitalize_first('NameOfVariable')
+        'NameOfVariable'
+        >>> capitalize_first('name of variable')
+        'Name of variable'
+        >>> capitalize_first('name-of-variable')
+        'Name-of-variable'
+    """
+    if len(text) == 0:
+        return text
+
+    elif len(text) == 1:
+        return text.upper()
+
+    else:
+        return text[0].upper() + text[1:]
+
+
 # INCREMENTERS
 def increment_character(text: str) -> str:
     """Increment a letter sequence in a manner similar to Excel column naming
@@ -774,6 +835,62 @@ def increment_digit(text: str, digits: int = None) -> str:
     return text + incremented_number
 
 
+def add_suffix(name: str, suffix: str, separator=SEPARATOR) -> str:
+    """Add a suffix to a name using a separator
+
+    Args:
+        name (str): The name to add the suffix to
+        suffix (str): The suffix to add
+        separator (str): The separator to use. Defaults to '_'
+
+    Returns:
+        str: The name with the suffix added
+
+    Example:
+        >>> add_suffix('name', 'Suffix')
+        'name_suffix'
+        >>> add_suffix('name_', '_suffix')
+        'name_suffix'
+        >>> add_suffix('name', '123')
+        'name_123'
+        >>> add_suffix('name', '')
+        'name_'
+    """
+
+    name = to_camel_case(text=name)
+    suffix = to_camel_case(text=suffix)
+
+    return f"{name}{separator}{suffix}"
+
+
+def add_prefix(name: str, prefix: str, separator=SEPARATOR) -> str:
+    """Add a prefix to a name using a separator
+
+    Args:
+        name (str): The name to add the prefix to
+        prefix (str): The prefix to add
+        separator (str): The separator to use. Defaults to '_'
+
+    Returns:
+        str: The name with the prefix added
+
+    Example:
+        >>> add_prefix('name', 'Prefix')
+        'prefix_name'
+        >>> add_prefix('name_', '_prefix')
+        'prefix_name'
+        >>> add_prefix('name', '123')
+        '123_name'
+        >>> add_prefix('name', '')
+        '_name'
+    """
+
+    name = to_camel_case(text=name)
+    prefix = to_camel_case(text=prefix)
+
+    return f"{prefix}{separator}{name}"
+
+
 # DECREMENTERS
 def decrement_character(text: str) -> str:
     """Decrement a letter sequence in a manner similar to Excel column naming
@@ -860,3 +977,32 @@ def decrement_digit(text: str) -> str:
         return text[:match.start()] + decremented_number
 
     return text
+
+
+# NAMING CONVENTION
+def compose_name(name: str, side: str = 'c', position: str = '') -> str:
+    """ Compose a name using the given elements and a template 'namePosition_side'
+
+    Args:
+        name (str): The base name
+        side (str, optional): The side. Defaults to 'c'
+        position (str, optional): The position. Defaults to ''
+
+    Returns:
+        str: The composed name
+
+    Example:
+        >>> compose_name("arm", "l", "front")
+        "armFront_l"
+        >>> compose_name("arm")
+        "arm_c"
+    """
+
+    is_valid(element=side.lower(), valid_list=VALID_SIDE)
+
+    is_valid(element=position.lower(), valid_list=VALID_POSITION)
+    position = capitalize_first(text=position)
+
+    name = to_camel_case(text=name)
+
+    return NAME_TEMPLATE.format(name=name, position=position, separator=SEPARATOR, side=side)
