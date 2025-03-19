@@ -1,5 +1,5 @@
 """
-Module providing string manipulation functions.
+Module providing string manipulation facilities.
 """
 import re
 from typing import Union
