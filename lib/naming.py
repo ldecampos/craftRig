@@ -1,14 +1,8 @@
-"""Module providing a set of powerful regular expression facilities"""
+"""
+Module providing string manipulation functions.
+"""
 import re
 from typing import Union
-
-# CONSTANTS
-SEPARATOR = '_'
-NAME_TEMPLATE = "{name}{position}{separator}{side}"  # namePosition_side
-VALID_SIDE = ['l', 'r', 'c', 'm', 'left', 'right', 'center', 'middle']
-VALID_POSITION = ['forward', 'backward', 'front', 'back',
-                  'up', 'down', 'top', 'bottom',
-                  'in', 'out', 'inside', 'outside']
 
 
 # VALIDATORS
@@ -178,30 +172,6 @@ def is_character_in(text: str, character: str = '_') -> bool:
     return bool(character in text)
 
 
-def is_valid(element: str, valid_list: list) -> bool:
-    """Check if an element is present in a list of valid items
-
-    Args:
-        element (str): Element to check for presence in the valid list
-        valid_list (list): The list of valid items to check against
-
-    Returns:
-        bool: True if the element is in the valid list, False otherwise.
-
-    Examples:
-        >>> is_valid("apple", ["apple", "banana", "cherry"])
-        True
-        >>> is_valid("orange", ["apple", "banana", "cherry"])
-        False
-        >>> is_valid("car", ["bike", "bus", "train"])
-        False
-        >>> is_valid("bus", ["bike", "bus", "train"])
-        True
-    """
-
-    return element in valid_list
-
-
 # GETTERS
 def get_case_style(text: str) -> bool:
     """Determine the naming style of a given text.
@@ -295,7 +265,6 @@ def get_digit_by_index(text: str, index: int = 0) -> Union[str, list]:
         []
     """
 
-    # Get number
     number = get_digits(text)
 
     return number[index] if number else []
@@ -324,7 +293,6 @@ def get_first_number(text: str) -> Union[str, list]:
         []
     """
 
-    # Get number
     number = get_digits(text)
 
     return number[0] if number else []
@@ -353,7 +321,6 @@ def get_last_number(text: str) -> Union[str, list]:
         []
     """
 
-    # Get number
     number = get_digits(text=text)
 
     return number[-1] if number else []
@@ -383,13 +350,10 @@ def get_values_between_brackets(text: str) -> list:
         []
     """
 
-    # Capture everything inside brackets
     results = re.findall(r"\[([^\]]+)\]", text)
 
-    # Extract numbers from the contents within brackets
     numeric_results = []
     for item in results:
-        # Find all numbers in the string
         numbers = re.findall(r'\d+', item)
         numeric_results.extend(numbers)
 
@@ -465,17 +429,13 @@ def to_camel_case(text: str, delete_numbers: bool = False) -> str:
         'nameOfVariable'
     """
 
-    # Split text into individual words
     splited_text = split_text(text)
 
-    # First word is in lowercase
     camel_case = splited_text[0].lower()
 
-    # Capitalize the first letter of each subsequent word
     for word in splited_text[1:]:
         camel_case += word.capitalize()
 
-    # Remove numbers if required
     if delete_numbers:
         camel_case = remove_numbers(camel_case)
 
@@ -503,15 +463,12 @@ def to_pascal_case(text: str, delete_numbers: bool = False) -> str:
         'NameOfVariable'
     """
 
-    # Split text into individual words
     splited_text = split_text(text)
 
-    # Capitalize the first letter of each subsequent word
     pascal_case = ''
     for word in splited_text:
         pascal_case += word.capitalize()
 
-    # Remove numbers if required
     if delete_numbers:
         pascal_case = remove_numbers(pascal_case)
 
@@ -539,16 +496,13 @@ def to_snake_case(text: str, delete_numbers: bool = False) -> str:
         'name_of_variable'
     """
 
-    # Split text into individual words
     splited_text = split_text(text)
 
-    # Join words with underscores to create snake_case
     snake_case = []
     for word in splited_text:
         snake_case.append(word.lower())
     snake_case = '_'.join(snake_case)
 
-    # Remove numbers if required
     if delete_numbers:
         snake_case = remove_numbers(snake_case)
         snake_case = to_snake_case(snake_case)
@@ -580,16 +534,13 @@ def to_kebab_case(text: str, delete_numbers: bool = False) -> str:
         'name-of-variable'
     """
 
-    # Split text into individual words
     splited_text = split_text(text)
 
-    # Join words with script to create kebab-case
     kebab_case = []
     for word in splited_text:
         kebab_case.append(word.lower())
     kebab_case = '-'.join(kebab_case)
 
-    # Remove numbers if required
     if delete_numbers:
         kebab_case = remove_numbers(kebab_case)
         kebab_case = to_kebab_case(kebab_case)
@@ -599,9 +550,6 @@ def to_kebab_case(text: str, delete_numbers: bool = False) -> str:
 
 def convert_value_to_text(value: Union[int, float]) -> str:
     """Convert a number to a string with the following format: Mxdx
-
-    The function converts negative values by prefixing them with 'M'. 
-    The decimal point is replaced with 'd'. 
 
     Args:
         value(int, float): Value to convert to string
@@ -621,17 +569,11 @@ def convert_value_to_text(value: Union[int, float]) -> str:
     """
 
     sign = ''
-    # Check for negatives values
     if value < 0:
-        # Get sign
         sign = 'M'
-        # Convert value to positive
         value = abs(value)  # Convert value to positive
 
-    # Format the value, replacing the decimal point with 'd'
-    value_name = f'{sign}{value}'.replace('.', 'd')
-
-    return value_name
+    return f'{sign}{value}'.replace('.', 'd')
 
 
 def convert_text_to_value(text: str) -> float:
@@ -659,16 +601,12 @@ def convert_text_to_value(text: str) -> float:
         -100.01
     """
 
-    # Get sign
     sign = 1
     if text[0] == 'M':
         sign = -1
         text = text[1:]
 
-    # Convert text to number
-    value = float(text.replace('d', '.'))
-
-    return value * sign
+    return float(text.replace('d', '.')) * sign
 
 
 def remove_numbers(text: str) -> str:
@@ -713,7 +651,6 @@ def split_text(text: str) -> list:
         >>> split_text('Another_Example-Here99')
         ['Another', 'Example', 'Here', '99']
     """
-
     return re.findall(r'[A-Z]?[a-z]+|[A-Z]+(?=\s|$)|[0-9]+|[a-z]+|[A-Za-z]+(?=[_-])', text)
 
 
@@ -736,14 +673,10 @@ def capitalize_first(text: str) -> str:
         >>> capitalize_first('name-of-variable')
         'Name-of-variable'
     """
-    if len(text) == 0:
-        return text
-
-    elif len(text) == 1:
+    if len(text) == 1:
         return text.upper()
 
-    else:
-        return text[0].upper() + text[1:]
+    return text[0].upper() + text[1:]
 
 
 # INCREMENTERS
@@ -776,10 +709,8 @@ def increment_character(text: str) -> str:
     is_upper = text[0].isupper()
     start_char = 'A' if is_upper else 'a'
     end_char = 'Z' if is_upper else 'z'
-
     # Start from the last character
     i = len(text) - 1
-
     while i >= 0:
         if text[i] != end_char:
             text[i] = chr(ord(text[i]) + 1)  # Increment character
@@ -787,7 +718,6 @@ def increment_character(text: str) -> str:
         else:
             text[i] = start_char  # Reset current position to start character
             i -= 1
-
     # Prepend 'A' or 'a' if all characters were 'Z' or 'z'
     return start_char + ''.join(text)
 
@@ -819,32 +749,27 @@ def increment_digit(text: str, digits: int = None) -> str:
 
     if not digits:
         digits = 2
-
     # Get the last number in the string
     match = re.search(r'(\d+)$', text)
-
     if match:
         # Get the current number, increment it, and pad it
         current_number = match.group(1)
         incremented_number = str(int(current_number) + 1).zfill(digits)
-
         return text[:match.start()] + incremented_number
 
-    incremented_number = "1".zfill(digits)
-
-    return text + incremented_number
+    return text + "1".zfill(digits)
 
 
-def add_suffix(name: str, suffix: str, separator=SEPARATOR) -> str:
-    """Add a suffix to a name using a separator
+def add_suffix(text: str, suffix: str, separator: str = '_') -> str:
+    """Add a suffix to a text using a separator
 
     Args:
-        name (str): The name to add the suffix to
+        text (str): Text to add the suffix to
         suffix (str): The suffix to add
         separator (str): The separator to use. Defaults to '_'
 
     Returns:
-        str: The name with the suffix added
+        str: Text with the suffix added
 
     Example:
         >>> add_suffix('name', 'Suffix')
@@ -857,22 +782,22 @@ def add_suffix(name: str, suffix: str, separator=SEPARATOR) -> str:
         'name_'
     """
 
-    name = to_camel_case(text=name)
+    text = to_camel_case(text=text)
     suffix = to_camel_case(text=suffix)
 
-    return f"{name}{separator}{suffix}"
+    return f"{text}{separator}{suffix}"
 
 
-def add_prefix(name: str, prefix: str, separator=SEPARATOR) -> str:
-    """Add a prefix to a name using a separator
+def add_prefix(text: str, prefix: str, separator: str = '_') -> str:
+    """Add a prefix to a text using a separator
 
     Args:
-        name (str): The name to add the prefix to
+        text (str): Text to add the prefix to
         prefix (str): The prefix to add
         separator (str): The separator to use. Defaults to '_'
 
     Returns:
-        str: The name with the prefix added
+        str: Text with the prefix added
 
     Example:
         >>> add_prefix('name', 'Prefix')
@@ -885,10 +810,36 @@ def add_prefix(name: str, prefix: str, separator=SEPARATOR) -> str:
         '_name'
     """
 
-    name = to_camel_case(text=name)
+    text = to_camel_case(text=text)
     prefix = to_camel_case(text=prefix)
 
-    return f"{prefix}{separator}{name}"
+    return f"{prefix}{separator}{text}"
+
+
+def add_text(text: str, text_to_add: str = '') -> str:
+    """Add a text to another text in PascalCase
+
+    Args:
+        text (str): The text to add to
+        text_to_add (str): The text to add. Defaults to ''
+
+    Returns:
+        str: The text with the text_to_add added
+
+    Example:
+        >>> add_text('name', 'suffix')
+        'nameSuffix'
+        >>> add_text('name_', '_suffix')
+        'nameSuffix'
+        >>> add_text('name', 'suffix_prefix')
+        'nameSuffixPrefix'
+        >>> add_text('name', '123')
+        'name123'
+    """
+    if text_to_add:
+        text_to_add = to_pascal_case(text=text_to_add)
+
+    return f'{text}{text_to_add}'
 
 
 # DECREMENTERS
@@ -923,10 +874,8 @@ def decrement_character(text: str) -> str:
     is_upper = text[0].isupper()
     start_char = 'A' if is_upper else 'a'
     end_char = 'Z' if is_upper else 'z'
-
     # Start from the last character
     i = len(text) - 1
-
     while i >= 0:
         if text[i] != start_char:
             text[i] = chr(ord(text[i]) - 1)  # Decrement character
@@ -934,7 +883,6 @@ def decrement_character(text: str) -> str:
         else:
             text[i] = end_char  # Reset current position to end character
             i -= 1
-
     # Remove one character from the start if all were 'A' or 'a'
     return ''.join(text[1:])
 
@@ -965,7 +913,6 @@ def decrement_digit(text: str) -> str:
 
     # Get the last number in the string
     match = re.search(r'(\d+)$', text)
-
     if match:
         # Get the current number, decrement it, and pad it
         current_number = match.group(1)
@@ -977,32 +924,3 @@ def decrement_digit(text: str) -> str:
         return text[:match.start()] + decremented_number
 
     return text
-
-
-# NAMING CONVENTION
-def compose_name(name: str, side: str = 'c', position: str = '') -> str:
-    """ Compose a name using the given elements and a template 'namePosition_side'
-
-    Args:
-        name (str): The base name
-        side (str, optional): The side. Defaults to 'c'
-        position (str, optional): The position. Defaults to ''
-
-    Returns:
-        str: The composed name
-
-    Example:
-        >>> compose_name("arm", "l", "front")
-        "armFront_l"
-        >>> compose_name("arm")
-        "arm_c"
-    """
-
-    is_valid(element=side.lower(), valid_list=VALID_SIDE)
-
-    is_valid(element=position.lower(), valid_list=VALID_POSITION)
-    position = capitalize_first(text=position)
-
-    name = to_camel_case(text=name)
-
-    return NAME_TEMPLATE.format(name=name, position=position, separator=SEPARATOR, side=side)
