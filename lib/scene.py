@@ -1,8 +1,6 @@
 """
-Scene module
+This module provides functionality for interacting with and managing scenes in Autodesk Maya.
 """
-
-
 # Maya imports
 from maya import cmds
 
