@@ -2,15 +2,11 @@
 This module provides a `Node` class that represents a node in a Maya scene.
 It includes methods for creating, querying, modifying, and deleting nodes
 """
-
 # Maya imports
 from maya import cmds
 
-# Local imports
-from craftRig.lib.scene import Scene
 
-
-class Node(Scene):
+class Node(object):
     """
     Node class
     """
